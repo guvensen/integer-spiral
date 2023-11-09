@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  php8:
+    container_name: php8
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    hostname: php8
+    volumes:
+      - php8-www:/var/www-php8/
+      - php8-config:/etc/conf.d/
+      - /etc/localtime:/etc/localtime:ro # Sync container and host machine datetime.
+    networks:
+      - backend
+volumes:
+  php8-www:
+    external: true
+  php8-config:
+    external: true
+networks:
+  backend:
+    external: true
+

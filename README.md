@@ -1,1 +1,1 @@
-# integer-spiral
+# Integer Spiral API

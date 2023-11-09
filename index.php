@@ -1,0 +1,3 @@
+<?
+
+echo "Integer Spiral API";
