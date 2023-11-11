@@ -4,6 +4,7 @@ namespace App;
 
 use PDO;
 use Database\Database;
+use Exception;
 
 class IntegerSpiralService
 {
@@ -18,156 +19,192 @@ class IntegerSpiralService
         $this->conn = $database->getConnection();
     }
 
-    public function getLayouts(): array
+    public function getLayouts(): string
     {
-        $sql = "SELECT x,y,value,created_at FROM integer_layout";
+        try {
+            $sql = "SELECT id,x,y FROM integer_layout ORDER BY id ASC";
 
-        $stmt = $this->conn->prepare($sql);
-        $result = $stmt->execute();
-        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $data = [];
-
-        foreach ($row as $key =>  $value){
-            var_dump($key, $value);
+            if(!$row){
+                throw new Exception("Layout not found.", 404);
+            }
+        }catch (Exception $e){
+            http_response_code($e->getCode());
+            echo $e->getMessage();
+            exit;
         }
 
-        //var_dump($data);
-
-        return [];
+        return json_encode($row);
     }
 
-    public function getLayoutById(string $id) {
-        var_dump("Get the layout with id {$id}");
+    public function getLayoutById(string $id): string
+    {
+        try {
+            $sql = "SELECT id,x,y FROM integer_layout WHERE id = {$id}";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if(!$row){
+                throw new Exception("Layout not found.", 404);
+            }
+        }catch (Exception $e){
+            http_response_code($e->getCode());
+            echo $e->getMessage();
+            exit;
+        }
+
+        return json_encode($row);
     }
 
-    public function createLayout( string $x, string $y) : int{
+    public function getValueOfLayout(string $id, string $x, string $y): string
+    {
+        try {
+            $sql = "SELECT x,y,value FROM integer_layout WHERE id = {$id}";
 
-        for($ax = 0; $ax < $x; $ax++){
-            $this->axisX[] = $ax;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if(!$row){
+                throw new Exception("Layout not found.", 404);
+            }
+
+            $matrix = json_decode($row["value"]);
+            $layoutX = $row["x"];
+            $layoutY= $row["y"];
+
+            if($x >= $layoutX || $y >= $layoutY){
+                throw new Exception("X or Y coordinate is incorrect.", 412);
+            }
+        }catch (Exception $e){
+            http_response_code($e->getCode());
+            echo $e->getMessage();
+            exit;
         }
 
-        for($ay = 0; $ay < $y; $ay++){
-            $this->axisY[] = $ay;
-        }
+        return $matrix[$y][$x];
+    }
 
-        $matrix = [];
+    public function getLayoutByIdWithTable(string $id): string {
+        try {
+            $sql = "SELECT x,y,value FROM integer_layout WHERE id = {$id}";
 
-        $this->lastNumber = $lastNumber = $x * $y;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        for ($i = 0; $i < $y; $i++){
-            $matrix[$i] = array_fill(0, $x, 0);
-        }
 
-        do{
-            $matrix = $this->fillLeftToRight($matrix, $this->axisY);
+            if(!$row){
+                throw new Exception("Layout not found.", 404);
+            }
 
-            $matrix = $this->fillTopToBottom($matrix, $this->axisX);
+            $matrix = json_decode($row["value"]);
+            $x = $row["x"];
+            $y = $row["y"];
 
-            $matrix = $this->fillRightToLeft($matrix, $this->axisY);
+            $table = '<!DOCTYPE html>
+            <html>
+            <head>
+                <title>Integer Spiral | Güven Şen</title>
+                <style>
+                    p{
+                        margin: 0;
+                    }
+                    .wrapper{
+                        padding: 15px; background-color: #202528
+                    }
+            
+                    .table-wrapper{
+                        display: flex;
+                        flex-direction: row;
+                    }
+            
+                    .left-header-wrapper{
+                        border-top: 1px solid #ced3d8;
+                        border-bottom: 1px solid #ced3d8;
+                    }
+            
+                    .left-header-wrapper > .header{
+                        text-align: center;
+                        height: 15px;
+                    }
+            
+                    .left-header-wrapper > .header-title{
+                        text-align: center;
+                        height: 15px;
+                        color: #ced3d8;
+                        border-left: 1px solid #ced3d8;
+                        border-bottom: 1px solid #ced3d8;
+                        padding: 10px 15px;
+                    }
+            
+                    .header-wrapper{
+                        display: flex;
+                        border: 1px solid #ced3d8;
+                        padding: 0;
+                    }
+                    .content-wrapper > .header-wrapper{
+                        border-left: unset;
+                    }
+            
+                    .content-wrapper > .header-wrapper > .header {
+                        width: 25px;
+                        height: 15px;
+                        color: #ced3d8;
+                        border-left: 1px solid #ced3d8;
+                        border-right: 1px solid #ced3d8;
+                    }
+            
+                    .header {
+                        color: #ced3d8;
+                        padding: 10px 15px;
+                        margin-right: -1px;
+                        border-left: 1px solid #ced3d8;
+                        border-right: 1px solid #ced3d8;
+                    }
+            
+                    .cell-wrapper{
+                        display: flex;
+                    }
+            
+                    .cell {
+                        width: 25px;
+                        height: 15px;
+                        color: #cbbc6a;
+                        border-left: 1px solid #ced3d8;
+                        border-right: 1px solid #ced3d8;
+                        padding: 10px 15px;
+                        margin-right: -1px;
+                    }
+            
+                    .content-wrapper > .cell-wrapper:last-child .cell {
+                        border-bottom: 1px solid #ced3d8;
+                    }
+                </style>
+            </head>
+            <body>
+            <div class="wrapper">
+                <div class="table-wrapper">
+                        <div class="left-header-wrapper">
+                            <div class="header-title"> (index)</div>';
 
-            $matrix = $this->fillBottomToTop($matrix, $this->axisX);
+            for ($tlh = 0; $tlh < $y; $tlh ++){
+                $table .= "<div class='header'><p>".$tlh."</p></div>";
+            }
 
-        }while($this->currentNumber < $lastNumber);
-
-        $table = '<!DOCTYPE html>
-<html>
-<head>
-    <title>Integer Spiral | Güven Şen</title>
-    <style>
-        p{
-            margin: 0;
-        }
-        .wrapper{
-            padding: 15px; background-color: #202528
-        }
-
-        .table-wrapper{
-            display: flex;
-            flex-direction: row;
-        }
-
-        .left-header-wrapper{
-            border-top: 1px solid #ced3d8;
-            border-bottom: 1px solid #ced3d8;
-        }
-
-        .left-header-wrapper > .header{
-            text-align: center;
-            height: 15px;
-        }
-
-        .left-header-wrapper > .header-title{
-            text-align: center;
-            height: 15px;
-            color: #ced3d8;
-            border-left: 1px solid #ced3d8;
-            border-bottom: 1px solid #ced3d8;
-            padding: 10px 15px;
-        }
-
-        .header-wrapper{
-            display: flex;
-            border: 1px solid #ced3d8;
-            padding: 0;
-        }
-        .content-wrapper > .header-wrapper{
-            border-left: unset;
-        }
-
-        .content-wrapper > .header-wrapper > .header {
-            width: 25px;
-            height: 15px;
-            color: #ced3d8;
-            border-left: 1px solid #ced3d8;
-            border-right: 1px solid #ced3d8;
-        }
-
-        .header {
-            color: #ced3d8;
-            padding: 10px 15px;
-            margin-right: -1px;
-            border-left: 1px solid #ced3d8;
-            border-right: 1px solid #ced3d8;
-        }
-
-        .cell-wrapper{
-            display: flex;
-        }
-
-        .cell {
-            width: 25px;
-            height: 15px;
-            color: #cbbc6a;
-            border-left: 1px solid #ced3d8;
-            border-right: 1px solid #ced3d8;
-            padding: 10px 15px;
-            margin-right: -1px;
-        }
-
-        .content-wrapper > .cell-wrapper:last-child .cell {
-            border-bottom: 1px solid #ced3d8;
-        }
-    </style>
-</head>
-<body>
-<div class="wrapper">
-    <div class="table-wrapper">
-            <div class="left-header-wrapper">
-                <div class="header-title"> (index)</div>';
-
-        for ($tlh = 0; $tlh < $y; $tlh ++){
-            $table .= "<div class='header'><p>".$tlh."</p></div>";
-        }
-
-        $table .='  </div>
+            $table .='  </div>
             <div class="content-wrapper">
                 <div class="header-wrapper">';
 
-        for ($th = 0; $th < $x; $th ++){
-            $table .= "<div class='header'><p>".$th."</p></div>";
-        }
-        $table .=  '</div>';
+            for ($th = 0; $th < $x; $th ++){
+                $table .= "<div class='header'><p>".$th."</p></div>";
+            }
+            $table .=  '</div>';
             foreach ($matrix as $mvalue){
                 $table .= "<div class='cell-wrapper'>";
                 foreach ($mvalue as $nvalue){
@@ -175,20 +212,74 @@ class IntegerSpiralService
                 }
                 $table .= "</div>";
             }
-        $table .='
-            </div>
-        </div>
-    </div>
-</body>
-</html>';
+            $table .='
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>';
 
-        $data = json_encode($matrix);
+        }catch (Exception $e){
+            http_response_code($e->getCode());
+            echo $e->getMessage();
+            exit;
+        }
 
-        $sql = "INSERT INTO integer_layout (x,y,value) VALUES ($x, $y, '{$data}')";
+        return $table;
+    }
 
-        $stmt = $this->conn->prepare($sql);
+    public function createLayout( string | null $x, string | null $y) : int{
 
-        $stmt->execute();
+
+        try {
+            if(is_null($x) || is_null($y)){
+                throw new Exception("X or Y coordinate is incorrect.", 412);
+            }
+
+            if(!is_numeric($x) || !is_numeric($y) || strpos($x, ".") || strpos($y, ".")){
+                throw new Exception("Coordinates must be integer.", 412);
+            }
+
+            for($ax = 0; $ax < $x; $ax++){
+                $this->axisX[] = $ax;
+            }
+
+            for($ay = 0; $ay < $y; $ay++){
+                $this->axisY[] = $ay;
+            }
+
+            $matrix = [];
+
+            $this->lastNumber = $lastNumber = $x * $y;
+
+            for ($i = 0; $i < $y; $i++){
+                $matrix[$i] = array_fill(0, $x, 0);
+            }
+
+            do{
+                $matrix = $this->fillLeftToRight($matrix, $this->axisY);
+
+                $matrix = $this->fillTopToBottom($matrix, $this->axisX);
+
+                $matrix = $this->fillRightToLeft($matrix, $this->axisY);
+
+                $matrix = $this->fillBottomToTop($matrix, $this->axisX);
+
+            }while($this->currentNumber < $lastNumber);
+
+            $data = json_encode($matrix);
+
+            $sql = "INSERT INTO integer_layout (x,y,value) VALUES ($x, $y, '{$data}')";
+
+            $stmt = $this->conn->prepare($sql);
+
+            $stmt->execute();
+
+        }catch (Exception $e){
+            http_response_code($e->getCode());
+            echo $e->getMessage();
+            exit;
+        }
 
         return $this->conn->lastInsertId();
     }

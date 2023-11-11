@@ -20,23 +20,31 @@ class IntegerSpiralController
         switch ($method){
             case 'GET':
                 if ($id){
-                    $this->service->getLayoutById($id);
+                    $isTable= array_key_exists('isTable', $_GET) ? $_GET['isTable'] : null;
+
+                    if($isTable === "1"){
+                        $result = $this->service->getLayoutByIdWithTable($id);
+                    }else{
+                        header("Content-type: application/json; charset=UTF-8");
+                        $x = array_key_exists('x', $_GET) ? $_GET['x'] : null;
+                        $y = array_key_exists('y', $_GET) ? $_GET['y'] : null;
+
+                        if(!is_null($x) && !is_null($y)){
+                            $result = $this->service->getValueOfLayout($id,$x,$y);
+                        }else{
+                            $result = $this->service->getLayoutById($id);
+                        }
+                    }
                 }else{
-                    $result =  $this->service->getLayouts();
+                    header("Content-type: application/json; charset=UTF-8");
+                    $result = $this->service->getLayouts();
                 }
                 break;
             case 'POST':
+                header("Content-type: application/json; charset=UTF-8");
                 $x = array_key_exists('x', $_GET) ? $_GET['x'] : null;
                 $y = array_key_exists('y', $_GET) ? $_GET['y'] : null;
 
-                try{
-                    if(is_null($x) || is_null($y)){
-                        throw new Exception("", 412);
-                    }
-                }catch (Exception $e){
-                    http_response_code(412);
-                    exit;
-                }
                 $result = $this->service->createLayout($x,$y);
                 break;
         }

@@ -6,8 +6,6 @@ use \Dotenv\Dotenv AS Dotenv;
 
 require __DIR__ . '/vendor/autoload.php';
 
-header("Content-type: application/json; charset=UTF-8");
-
 Dotenv::createUnsafeImmutable(__DIR__ . '/')->load();
 
 $database = new Database(
