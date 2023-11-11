@@ -4,6 +4,7 @@ namespace App;
 
 use \App\IntegerSpiralService AS IntegerSpiralService;
 use Database\Database;
+use Exception;
 
 class IntegerSpiralController
 {
@@ -13,19 +14,33 @@ class IntegerSpiralController
         $this->service = new IntegerSpiralService($database);
     }
 
-    public function index(string $method, ?string $id): void
+    public function index(string $method, string $query, ?string $id): string | object | array
     {
+        $result = "";
         switch ($method){
             case 'GET':
                 if ($id){
                     $this->service->getLayoutById($id);
                 }else{
-                    $this->service->getLayouts();
+                    $result =  $this->service->getLayouts();
                 }
                 break;
             case 'POST':
-                $this->service->createLayout();
+                $x = array_key_exists('x', $_GET) ? $_GET['x'] : null;
+                $y = array_key_exists('y', $_GET) ? $_GET['y'] : null;
+
+                try{
+                    if(is_null($x) || is_null($y)){
+                        throw new Exception("", 412);
+                    }
+                }catch (Exception $e){
+                    http_response_code(412);
+                    exit;
+                }
+                $result = $this->service->createLayout($x,$y);
                 break;
         }
+
+        return $result;
     }
 }

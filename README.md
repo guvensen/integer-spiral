@@ -20,7 +20,18 @@ CREATE TABLE public.integer_layout
 );
 ````
 
+Drop Database
+
+````
+DROP DATABASE integer_spiral WITH (FORCE)
+````
+
 ## Install with composer:
 
 ```composer require zircote/swagger-php```  
 ```composer require vlucas/phpdotenv```
+
+
+# Swagger Documentation
+
+[https://integer-spiral-api.guvensen.com/swagger](https://integer-spiral-api.guvensen.com/swagger)

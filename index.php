@@ -19,20 +19,28 @@ $database = new Database(
     $_ENV['DB_PASSWORD']
 );
 
-$path = explode('/', $_SERVER['REQUEST_URI']);
+if(strpos($_SERVER['REQUEST_URI'], "?")){
+    $requestUri = strstr( $_SERVER['REQUEST_URI'], '?', true);
+}else{
+    $requestUri = $_SERVER['REQUEST_URI'];
+}
+
+$path = explode('/', $requestUri);
+$query = $_SERVER['QUERY_STRING'];
 
 if(!array_key_exists(1, $path) || $path[1] === '' ){
     echo $_ENV['APP_NAME'] .' | Version= '.$_ENV['APP_VERSION'];
     exit;
 }
 
+$layoutController = new IntegerSpiralController($database);
+
 switch ($path[1]){
     case 'layout':
         $id = array_key_exists(2, $path) ? $path[2] : null;
         $method = $_SERVER['REQUEST_METHOD'];
 
-        $layoutController = new IntegerSpiralController($database);
-        $layoutController->index($method, $id);
+        echo $layoutController->index($method, $query, $id);
 
         break;
     default:
