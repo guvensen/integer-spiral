@@ -39,10 +39,11 @@ switch ($path[1]){
         $method = $_SERVER['REQUEST_METHOD'];
 
         echo $layoutController->index($method, $query, $id);
-
         break;
     default:
+        header("Content-type: application/json; charset=UTF-8");
         http_response_code(404);
+        echo "Page not found.";
 }
 
 

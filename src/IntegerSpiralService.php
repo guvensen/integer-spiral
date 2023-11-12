@@ -6,6 +6,12 @@ use PDO;
 use Database\Database;
 use Exception;
 
+/**
+ * @OA\Info(
+ *     title="Integer Spiral API",
+ *     version="0.0.1"
+ * )
+ */
 class IntegerSpiralService
 {
     private PDO $conn;
@@ -19,6 +25,21 @@ class IntegerSpiralService
         $this->conn = $database->getConnection();
     }
 
+    /**
+     * @OA\Get(
+     *   path="/layout",
+     *   tags={"Layout"},
+     *   summary="List layouts",
+     *   @OA\Response(
+     *     response=200,
+     *     description="successful operation"
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="layout not found"
+     *   )
+     * )
+     */
     public function getLayouts(): string
     {
         try {
@@ -40,6 +61,30 @@ class IntegerSpiralService
         return json_encode($row);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/layout/{layoutId}",
+     *   tags={"Layout"},
+     *   summary="Find layout by ID",
+     *   @OA\Parameter(
+     *       in="path",
+     *       required=true,
+     *       name="layoutId",
+     *       description="The layout ID specific to this layout",
+     *       @OA\Schema(
+     *         type="integer"
+     *      ),
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="successful operation"
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="layout not found"
+     *   )
+     * )
+     */
     public function getLayoutById(string $id): string
     {
         try {
@@ -61,6 +106,52 @@ class IntegerSpiralService
         return json_encode($row);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/layout/{layoutId}/value",
+     *   tags={"Layout"},
+     *   summary="Get value of layout",
+     *   @OA\Parameter(
+     *       in="path",
+     *       required=true,
+     *       name="layoutId",
+     *       description="The layout ID specific to this layout",
+     *       @OA\Schema(
+     *         type="integer"
+     *      ),
+     *   ),
+     *   @OA\Parameter(
+     *       in="query",
+     *       required=true,
+     *       name="x",
+     *       description="X coordinate of the layout",
+     *       @OA\Schema(
+     *         type="integer"
+     *      ),
+     *   ),
+     *   @OA\Parameter(
+     *       in="query",
+     *       required=true,
+     *       name="y",
+     *       description="Y coordinate of the layout",
+     *       @OA\Schema(
+     *         type="integer"
+     *      ),
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="successful operation"
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="layout not found"
+     *   ),
+     *   @OA\Response(
+     *     response=412,
+     *     description="x or y coordinate is incorrect"
+     *   )
+     * )
+     */
     public function getValueOfLayout(string $id, string $x, string $y): string
     {
         try {
@@ -228,9 +319,40 @@ class IntegerSpiralService
         return $table;
     }
 
+    /**
+     * @OA\Post(
+     *   path="/layout",
+     *   tags={"Layout"},
+     *   summary="Add a new layout",
+     *   @OA\Parameter(
+     *       in="query",
+     *       required=true,
+     *       name="x",
+     *       description="X coordinate of the layout",
+     *       @OA\Schema(
+     *         type="integer"
+     *      ),
+     *   ),
+     *   @OA\Parameter(
+     *        in="query",
+     *        required=true,
+     *        name="y",
+     *        description="Y coordinate of the layout",
+     *        @OA\Schema(
+     *          type="integer"
+     *       ),
+     *    ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="successful operation"
+     *   ),
+     *   @OA\Response(
+     *     response=412,
+     *     description="x or y coordinate is incorrect"
+     *   )
+     * )
+     */
     public function createLayout( string | null $x, string | null $y) : int{
-
-
         try {
             if(is_null($x) || is_null($y)){
                 throw new Exception("X or Y coordinate is incorrect.", 412);
