@@ -1,6 +1,6 @@
 # Integer Spiral API
 
-[Sample Project](https://integer-spiral-api.guvensen.com/){:target="_blank"}
+[Sample Project](https://integer-spiral-api.guvensen.com/)
 
 
 # Database
