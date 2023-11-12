@@ -6,13 +6,15 @@ use PDO;
 
 readonly class Database
 {
-    public function __construct( private string $connection,
-                                 private string $host,
-                                 private string $port,
-                                 private string $name,
-                                 private string $user,
-                                 private string $password
-    ) {}
+    public function __construct(
+        private string $connection,
+        private string $host,
+        private string $port,
+        private string $name,
+        private string $user,
+        private string $password
+    ) {
+    }
 
     public function getConnection(): PDO
     {

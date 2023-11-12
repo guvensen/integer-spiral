@@ -49,10 +49,10 @@ class IntegerSpiralService
             $stmt->execute();
             $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            if(!$row){
+            if (!$row) {
                 throw new Exception("Layout not found.", 404);
             }
-        }catch (Exception $e){
+        } catch (Exception $e) {
             http_response_code($e->getCode());
             echo $e->getMessage();
             exit;
@@ -94,10 +94,10 @@ class IntegerSpiralService
             $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if(!$row){
+            if (!$row) {
                 throw new Exception("Layout not found.", 404);
             }
-        }catch (Exception $e){
+        } catch (Exception $e) {
             http_response_code($e->getCode());
             echo $e->getMessage();
             exit;
@@ -161,18 +161,18 @@ class IntegerSpiralService
             $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if(!$row){
+            if (!$row) {
                 throw new Exception("Layout not found.", 404);
             }
 
             $matrix = json_decode($row["value"]);
             $layoutX = $row["x"];
-            $layoutY= $row["y"];
+            $layoutY = $row["y"];
 
-            if($x >= $layoutX || $y >= $layoutY){
+            if ($x >= $layoutX || $y >= $layoutY) {
                 throw new Exception("X or Y coordinate is incorrect.", 412);
             }
-        }catch (Exception $e){
+        } catch (Exception $e) {
             http_response_code($e->getCode());
             echo $e->getMessage();
             exit;
@@ -181,7 +181,8 @@ class IntegerSpiralService
         return $matrix[$y][$x];
     }
 
-    public function getLayoutByIdWithTable(string $id): string {
+    public function getLayoutByIdWithTable(string $id): string
+    {
         try {
             $sql = "SELECT x,y,value FROM integer_layout WHERE id = {$id}";
 
@@ -190,7 +191,7 @@ class IntegerSpiralService
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
-            if(!$row){
+            if (!$row) {
                 throw new Exception("Layout not found.", 404);
             }
 
@@ -284,33 +285,32 @@ class IntegerSpiralService
                         <div class="left-header-wrapper">
                             <div class="header-title"> (index)</div>';
 
-            for ($tlh = 0; $tlh < $y; $tlh ++){
-                $table .= "<div class='header'><p>".$tlh."</p></div>";
+            for ($tlh = 0; $tlh < $y; $tlh++) {
+                $table .= "<div class='header'><p>" . $tlh . "</p></div>";
             }
 
-            $table .='  </div>
+            $table .= '  </div>
             <div class="content-wrapper">
                 <div class="header-wrapper">';
 
-            for ($th = 0; $th < $x; $th ++){
-                $table .= "<div class='header'><p>".$th."</p></div>";
+            for ($th = 0; $th < $x; $th++) {
+                $table .= "<div class='header'><p>" . $th . "</p></div>";
             }
-            $table .=  '</div>';
-            foreach ($matrix as $mvalue){
+            $table .= '</div>';
+            foreach ($matrix as $mvalue) {
                 $table .= "<div class='cell-wrapper'>";
-                foreach ($mvalue as $nvalue){
-                    $table .= "<div class='cell'><p>" .$nvalue."</p></div>";
+                foreach ($mvalue as $nvalue) {
+                    $table .= "<div class='cell'><p>" . $nvalue . "</p></div>";
                 }
                 $table .= "</div>";
             }
-            $table .='
+            $table .= '
                         </div>
                     </div>
                 </div>
             </body>
             </html>';
-
-        }catch (Exception $e){
+        } catch (Exception $e) {
             http_response_code($e->getCode());
             echo $e->getMessage();
             exit;
@@ -352,21 +352,22 @@ class IntegerSpiralService
      *   )
      * )
      */
-    public function createLayout( string | null $x, string | null $y) : int{
+    public function createLayout(string|null $x, string|null $y): int
+    {
         try {
-            if(is_null($x) || is_null($y)){
+            if (is_null($x) || is_null($y)) {
                 throw new Exception("X or Y coordinate is incorrect.", 412);
             }
 
-            if(!is_numeric($x) || !is_numeric($y) || strpos($x, ".") || strpos($y, ".")){
+            if (!is_numeric($x) || !is_numeric($y) || strpos($x, ".") || strpos($y, ".")) {
                 throw new Exception("Coordinates must be integer.", 412);
             }
 
-            for($ax = 0; $ax < $x; $ax++){
+            for ($ax = 0; $ax < $x; $ax++) {
                 $this->axisX[] = $ax;
             }
 
-            for($ay = 0; $ay < $y; $ay++){
+            for ($ay = 0; $ay < $y; $ay++) {
                 $this->axisY[] = $ay;
             }
 
@@ -374,11 +375,11 @@ class IntegerSpiralService
 
             $this->lastNumber = $lastNumber = $x * $y;
 
-            for ($i = 0; $i < $y; $i++){
+            for ($i = 0; $i < $y; $i++) {
                 $matrix[$i] = array_fill(0, $x, 0);
             }
 
-            do{
+            do {
                 $matrix = $this->fillLeftToRight($matrix, $this->axisY);
 
                 $matrix = $this->fillTopToBottom($matrix, $this->axisX);
@@ -386,8 +387,7 @@ class IntegerSpiralService
                 $matrix = $this->fillRightToLeft($matrix, $this->axisY);
 
                 $matrix = $this->fillBottomToTop($matrix, $this->axisX);
-
-            }while($this->currentNumber < $lastNumber);
+            } while ($this->currentNumber < $lastNumber);
 
             $data = json_encode($matrix);
 
@@ -396,8 +396,7 @@ class IntegerSpiralService
             $stmt = $this->conn->prepare($sql);
 
             $stmt->execute();
-
-        }catch (Exception $e){
+        } catch (Exception $e) {
             http_response_code($e->getCode());
             echo $e->getMessage();
             exit;
@@ -406,11 +405,12 @@ class IntegerSpiralService
         return $this->conn->lastInsertId();
     }
 
-    public function fillLeftToRight($matrix, $axisY): array {
+    public function fillLeftToRight($matrix, $axisY): array
+    {
         $currentY = array_shift($axisY);
         $currentNumber = $this->currentNumber;
-        foreach ($this->axisX as $value){
-            if($currentNumber < $this->lastNumber) {
+        foreach ($this->axisX as $value) {
+            if ($currentNumber < $this->lastNumber) {
                 $matrix[$currentY][$value] = $currentNumber;
                 $currentNumber = $currentNumber + 1;
             }
@@ -421,13 +421,13 @@ class IntegerSpiralService
         return $matrix;
     }
 
-    public function fillTopToBottom($matrix, $axisX):array{
-
+    public function fillTopToBottom($matrix, $axisX): array
+    {
         $currentX = $axisX[count($axisX) - 1];
         $currentNumber = $this->currentNumber;
 
-        foreach ($this->axisY as $value){
-            if($currentNumber < $this->lastNumber) {
+        foreach ($this->axisY as $value) {
+            if ($currentNumber < $this->lastNumber) {
                 $matrix[$value][$currentX] = $currentNumber;
                 $currentNumber = $currentNumber + 1;
             }
@@ -440,15 +440,16 @@ class IntegerSpiralService
         return $matrix;
     }
 
-    public function fillRightToLeft($matrix, $axisY): array{
-        if(count($axisY) > 0){
-            $currentY = $axisY[count($axisY) -1];
+    public function fillRightToLeft($matrix, $axisY): array
+    {
+        if (count($axisY) > 0) {
+            $currentY = $axisY[count($axisY) - 1];
             $currentNumber = $this->currentNumber;
 
-            foreach (array_reverse($this->axisX) as $value){
-                if($currentNumber < $this->lastNumber){
+            foreach (array_reverse($this->axisX) as $value) {
+                if ($currentNumber < $this->lastNumber) {
                     $matrix[$currentY][$value] = $currentNumber;
-                    $currentNumber = $currentNumber +1;
+                    $currentNumber = $currentNumber + 1;
                 }
             }
 
@@ -461,11 +462,12 @@ class IntegerSpiralService
         return $matrix;
     }
 
-    public function fillBottomToTop($matrix, $axisX): array{
+    public function fillBottomToTop($matrix, $axisX): array
+    {
         $currentX = array_shift($axisX);
         $currentNumber = $this->currentNumber;
-        foreach (array_reverse($this->axisY) AS $value){
-            if($currentNumber < $this->lastNumber) {
+        foreach (array_reverse($this->axisY) as $value) {
+            if ($currentNumber < $this->lastNumber) {
                 $matrix[$value][$currentX] = $currentNumber;
                 $currentNumber = $currentNumber + 1;
             }

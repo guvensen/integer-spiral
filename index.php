@@ -1,8 +1,8 @@
 <?php
 
-use \App\IntegerSpiralController AS IntegerSpiralController;
-use \Database\Database AS Database;
-use \Dotenv\Dotenv AS Dotenv;
+use \App\IntegerSpiralController as IntegerSpiralController;
+use \Database\Database as Database;
+use \Dotenv\Dotenv as Dotenv;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -17,23 +17,23 @@ $database = new Database(
     $_ENV['DB_PASSWORD']
 );
 
-if(strpos($_SERVER['REQUEST_URI'], "?")){
-    $requestUri = strstr( $_SERVER['REQUEST_URI'], '?', true);
-}else{
+if (strpos($_SERVER['REQUEST_URI'], "?")) {
+    $requestUri = strstr($_SERVER['REQUEST_URI'], '?', true);
+} else {
     $requestUri = $_SERVER['REQUEST_URI'];
 }
 
 $path = explode('/', $requestUri);
 $query = $_SERVER['QUERY_STRING'];
 
-if(!array_key_exists(1, $path) || $path[1] === '' ){
-    echo $_ENV['APP_NAME'] .' | Version= '.$_ENV['APP_VERSION'];
+if (!array_key_exists(1, $path) || $path[1] === '') {
+    echo $_ENV['APP_NAME'] . ' | Version= ' . $_ENV['APP_VERSION'];
     exit;
 }
 
 $layoutController = new IntegerSpiralController($database);
 
-switch ($path[1]){
+switch ($path[1]) {
     case 'layout':
         $id = array_key_exists(2, $path) ? $path[2] : null;
         $method = $_SERVER['REQUEST_METHOD'];
