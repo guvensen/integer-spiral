@@ -152,7 +152,7 @@ class IntegerSpiralService
      *   )
      * )
      */
-    public function getValueOfLayout(string $id, string $x, string $y): string
+    public function getValueOfLayout(string $id, string|null $x, string|null $y): string
     {
         try {
             $sql = "SELECT x,y,value FROM integer_layout WHERE id = {$id}";
@@ -160,6 +160,10 @@ class IntegerSpiralService
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (is_null($x) || is_null($y)) {
+                throw new Exception("X or Y coordinate is incorrect.", 412);
+            }
 
             if (!$row) {
                 throw new Exception("Layout not found.", 404);
@@ -181,6 +185,30 @@ class IntegerSpiralService
         return $matrix[$y][$x];
     }
 
+    /**
+     * @OA\Get(
+     *   path="/layout/{layoutId}/tabular",
+     *   tags={"Layout"},
+     *   summary="Get tabular view of the layout",
+     *   @OA\Parameter(
+     *        in="path",
+     *        required=true,
+     *        name="layoutId",
+     *        description="The layout ID specific to this layout",
+     *        @OA\Schema(
+     *          type="integer"
+     *       ),
+     *    ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="successful operation"
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="layout not found"
+     *   )
+     * )
+     */
     public function getLayoutByIdWithTable(string $id): string
     {
         try {

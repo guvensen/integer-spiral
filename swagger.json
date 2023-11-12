@@ -1,0 +1,138 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Integer Spiral API",
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/layout": {
+            "get": {
+                "tags": [
+                    "Layout"
+                ],
+                "summary": "List layouts",
+                "operationId": "fc786d0d1f585066e4608b30fc9281ff",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "404": {
+                        "description": "layout not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Layout"
+                ],
+                "summary": "Add a new layout",
+                "operationId": "0b2bb3252032ef49808e7a0904e90e17",
+                "parameters": [
+                    {
+                        "name": "x",
+                        "in": "query",
+                        "description": "X coordinate of the layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "y",
+                        "in": "query",
+                        "description": "Y coordinate of the layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "412": {
+                        "description": "x or y coordinate is incorrect"
+                    }
+                }
+            }
+        },
+        "/layout/{layoutId}": {
+            "get": {
+                "tags": [
+                    "Layout"
+                ],
+                "summary": "Find layout by ID",
+                "operationId": "82a1529ce965fe1071d7fbfc87bb33e6",
+                "parameters": [
+                    {
+                        "name": "layoutId",
+                        "in": "path",
+                        "description": "The layout ID specific to this layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "404": {
+                        "description": "layout not found"
+                    }
+                }
+            }
+        },
+        "/layout/{layoutId}/value": {
+            "get": {
+                "tags": [
+                    "Layout"
+                ],
+                "summary": "Get value of layout",
+                "operationId": "b085e723ee1dcd8c8a39d0d32b2319ec",
+                "parameters": [
+                    {
+                        "name": "layoutId",
+                        "in": "path",
+                        "description": "The layout ID specific to this layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "x",
+                        "in": "query",
+                        "description": "X coordinate of the layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "y",
+                        "in": "query",
+                        "description": "Y coordinate of the layout",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "404": {
+                        "description": "layout not found"
+                    },
+                    "412": {
+                        "description": "x or y coordinate is incorrect"
+                    }
+                }
+            }
+        }
+    }
+}

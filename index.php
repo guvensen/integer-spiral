@@ -38,7 +38,7 @@ switch ($path[1]) {
         $id = array_key_exists(2, $path) ? $path[2] : null;
         $method = $_SERVER['REQUEST_METHOD'];
 
-        echo $layoutController->index($method, $query, $id);
+        echo $layoutController->index($method, $query, $id, $path);
         break;
     default:
         header("Content-type: application/json; charset=UTF-8");
